@@ -3,17 +3,23 @@ const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-var SQLiteStore = require('connect-sqlite3')(session);
-
-
+const sqlite3  = require("sqlite3").verbose();
+const {open} =require("sqlite");
+ 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: 'cat in the hat',
   resave: false,
   saveUninitialized: false,
-  store: new SQLiteStore({ db: 'sessions.db', dir: './db' })
 }));
+
+(async () => {
+  const db = await open({
+    filename : './db/database.db',
+    driver : sqlite3.cached.Database,
+  });
+})();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, { 
@@ -42,8 +48,8 @@ io.use((socket, next) => {
     return next(new Error("invalid username"));
   }
   // create new session
-  socket.sessionID = randomId();
-  socket.userID = randomId();
+  socket.sessionID = uuidv4();
+  socket.userID = uuidv4();
   console.log("random uid "+socket.userID);
   socket.username = username;
   next();
