@@ -3,9 +3,9 @@ const { v4: uuidv4 } = require('uuid');
 var session = require('express-session');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const sqlite3  = require("sqlite3").verbose();
-const {open} =require("sqlite");
- 
+const dbhandle = require("./dbhandle");
+const dbhelper = new dbhandle();
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
@@ -13,13 +13,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
-
-(async () => {
-  const db = await open({
-    filename : './db/database.db',
-    driver : sqlite3.cached.Database,
-  });
-})();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, { 
@@ -32,10 +25,12 @@ io.use((socket, next) => {
   console.log('middlewear socket');
   const sessionID = socket.handshake.auth.sessionID;
   if (sessionID) {
-    console.log('found session id '+sessionID);
+    console.log('Input session id '+sessionID);
     // find existing session
-    const session = sessionStore.findSession(sessionID);
+    const session = dbhelper.findsession(sessionID);
+    
     if (session) {
+      console.log("Session is "+JSON.stringify(session));
       socket.sessionID = sessionID;
       socket.userID = session.userID;
       socket.username = session.username;
@@ -52,6 +47,8 @@ io.use((socket, next) => {
   socket.userID = uuidv4();
   console.log("random uid "+socket.userID);
   socket.username = username;
+  const data=dbhelper.insertData({sessionid: socket.sessionID, userid:socket.userID, username:socket.username});
+  console.log("return after insert " + JSON.stringify(data));
   next();
 });
 
