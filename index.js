@@ -37,6 +37,7 @@ io.use((socket, next) => {
       return next();
     }//end of if session
   }
+  console.log("Socket obj is "+JSON.stringify(socket.handshake));
   const username = socket.handshake.auth.username;
   if (!username) {
     console.log('invalid username ');
