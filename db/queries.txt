@@ -1,0 +1,5 @@
+CREATE TABLE "sessions" (
+	"sessionid"	INTEGER,
+	"userid"	INTEGER,
+	"username"	TEXT
+);

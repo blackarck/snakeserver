@@ -48,7 +48,7 @@ io.use((socket, next) => {
   socket.userID = uuidv4();
   console.log("random uid "+socket.userID);
   socket.username = username;
-  const data=dbhelper.insertData({sessionid: socket.sessionID, userid:socket.userID, username:socket.username});
+  const data=dbhelper.insertsession({sessionid: socket.sessionID, userid:socket.userID, username:socket.username});
   console.log("return after insert " + JSON.stringify(data));
   next();
 });
@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on('userlogin', (data)=>{
-    console.log("data is "+ JSON.stringify(data));
+    console.log("data1 is "+ JSON.stringify(data));
   })
 });
 

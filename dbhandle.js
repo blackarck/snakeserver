@@ -1,28 +1,42 @@
 const sqlite3 = require("sqlite3").verbose();
 const { open } = require("sqlite");
 
+
 class dbhandle {
+
   constructor() {
-    async () => {
+    console.log("declaring db ");
+    this.db=null;
+    this.initdb();
+  }//end of constructor
+
+  async initdb() {
+    try {
       this.db = await open({
         filename: "./db/database.db",
         driver: sqlite3.cached.Database,
-      }).then((data) => {
-        console.log("Db is open " + db + " ,data-" + data);
       });
-    };
-  }
+      console.log("Db is open");
+    } catch (error) {
+      console.error("Error opening the database:", error);
+    }
+  }//end of initdb
 
   // Insert data
   async insertData(tableName, data, callback) {
-    console.log("Data is " + JSON.stringify(data));
+    console.log("DataIns is " + JSON.stringify(data) + " db is "+ this.db);
     if (data) {
       const columns = Object.keys(data).join(", ");
       const placeholders = Object.keys(data).fill("?").join(", ");
       const values = Object.values(data);
 
       const insertQuery = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`;
+      console.log("Before1 this.db " + this.db);
+      if(!this.db){
+
+      }
       if (this.db) {
+        console.log(" Messaging1 -" + insertQuery);
         await this.db.run(insertQuery, values, (err) => {
           if (err) {
             console.error("Error inserting data:", err.message);
@@ -32,7 +46,9 @@ class dbhandle {
           }
         });
       }
-    } //end of if data
+    } else {
+      console.log("DataIns is null-" + JSON.stringify(data)); //end of if data
+    }
   }
 
   // Query data
@@ -57,8 +73,9 @@ class dbhandle {
   }
 
   insertsession(sessiondtl) {
-    console.log("inserting " + JSON.stringify(sessiondtl));
-    this.insertData("sessions", { sessiondtl }, (data) => {
+    console.log("inserting " + JSON.stringify(sessiondtl) + " db is " + this.db);
+    this.insertData("sessions", sessiondtl, (data) => {
+      console.log("inserted post session" + JSON.stringify(data));
       return data;
     });
   }
