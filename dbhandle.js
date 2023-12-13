@@ -31,10 +31,7 @@ class dbhandle {
       const values = Object.values(data);
 
       const insertQuery = `INSERT INTO ${tableName} (${columns}) VALUES (${placeholders})`;
-      console.log("Before1 this.db " + this.db);
-      if(!this.db){
-
-      }
+    
       if (this.db) {
         console.log(" Messaging1 -" + insertQuery);
         await this.db.run(insertQuery, values, (err) => {
@@ -66,14 +63,14 @@ class dbhandle {
   }
 
   findsession(sessionid) {
-    this.queryData("sessions", "sessionid=" + sessionid, (rows) => {
+    this.queryData("sessions", "sessionid='" + sessionid +"'", (rows) => {
       console.log("found session id " + JSON.stringify(rows));
       return rows;
     });
   }
 
   insertsession(sessiondtl) {
-    console.log("inserting " + JSON.stringify(sessiondtl) + " db is " + this.db);
+    //console.log("inserting " + JSON.stringify(sessiondtl) + " db is " + this.db);
     this.insertData("sessions", sessiondtl, (data) => {
       console.log("inserted post session" + JSON.stringify(data));
       return data;
